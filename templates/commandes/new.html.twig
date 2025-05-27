@@ -1,0 +1,230 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Commande{% endblock %}
+
+{% block body %}
+<!--  Checkout Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <h1 class="mb-4">Informations</h1>
+        {{ form_start(form) }}
+        <div class="row g-5">
+            <div class="col-md-12 col-lg-6 col-xl-7">
+                <div class="row">
+                    <div class="col-md-12 col-lg-6">
+                        <div class="form-item w-100">
+                            <label class="form-label my-3">Nom<sup>*</sup></label>
+                            {{ form_widget(form.nom_client) }}
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-6">
+                        <div class="form-item w-100">
+                            <label class="form-label my-3">Prénom<sup>*</sup></label>
+                            {{ form_widget(form.prenom_client) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="form-label my-3">Adresse mail<sup>*</sup></label>
+                    {{ form_widget(form.mail_client) }}
+                </div>
+                <div class="form-item">
+                    <label class="form-label my-3">Numéro de téléphone <sup>*</sup></label>
+                    {{ form_widget(form.telephone_client) }}
+                </div>
+                <div class="form-item">
+                    <label class="form-label my-3">Date/Heure de récupération de la commande<sup>*</sup></label>
+                    {{ form_widget(form.date_recuperation) }}
+                </div>
+                <div class="form-item">
+                    <label class="form-label my-3">Commentaires</label>
+                    {{ form_widget(form.commentaires) }}
+                </div>
+            </div>
+<div class="col-md-12 col-lg-6 col-xl-5">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Produit</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prix</th>
+                    <th scope="col">Quantité</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produitCommande in form.commandeProduits %}
+                    <tr>
+                        <th scope="row">
+                            <div class="d-flex align-items-center mt-2">
+                                <img src="{{ asset('uploads/images/' ~ produitCommande.vars.data.produit.image) }}" class="img-fluid rounded-circle" style="width: 90px; height: 90px;" alt="">
+                            </div>
+                        </th>
+                        <td class="py-5">{{ produitCommande.vars.data.produit.nom }}</td>
+                        <td class="py-5">
+                           {{ produitCommande.vars.data.produit.prix | number_format(2, '.', ',') }}€
+                        </td>
+                        <td class="py-5">
+                            {{ form_widget(produitCommande.quantite, { 'attr': {'class': 'form-control', 'onchange': 'updateTotal(this)' } }) }}
+                        </td>
+                        <td class="py-5">
+                            <span class="total-price">
+                                {{ (produitCommande.vars.data.produit.prix * produitCommande.vars.data.quantite) | number_format(2, '.', ',') }}€
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+     <div class="container-fluid py-2">
+            <div class="container py-2">
+                <div class="p-2 bg-light rounded">
+    <!-- Section pour le total de la commande -->
+    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+        <div class="col-md-12">
+
+            <input type="hidden" name="commande[montant_total]" id="montant_total_input">
+            <div class="h5">Total de la commande : <span id="totalCommande"></span></div>
+        </div>
+    </div>
+
+    <!-- Section pour le bouton -->
+    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+        <div class="col-md-12">
+            <!-- <button type="button" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary" data-bs-toggle="modal" data-bs-target="#modalPaiement">
+                Procéder au paiement
+            </button>-->
+            <button type="button" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary" id="btnValiderPaiement">
+             Procéder au paiement
+            </button>
+
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+        {{ form_end(form) }}
+    </div>
+</div>
+
+
+<!-- Modale Paiement -->
+<div class="modal fade" id="modalPaiement" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Paiement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label>Numéro de carte</label>
+                    <input type="text" class="form-control" name="carte_numero" required>
+                </div>
+                <div class="mb-3">
+                    <label>Date d'expiration</label>
+                    <input type="text" class="form-control" name="carte_expiration" placeholder="MM/AA" required>
+                </div>
+                <div class="mb-3">
+                    <label>CVV</label>
+                    <input type="text" class="form-control" name="carte_cvv" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary" id="btnValiderPaiement">Valider et Soumettre</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+<script>
+function updateTotal(input) {
+    let row = input.closest('tr');
+    let price = parseFloat(row.querySelector('td:nth-child(3)').textContent.replace('€', '').replace(',', '.'));
+    let quantity = parseInt(input.value) || 0;
+    let total = price * quantity;
+
+    row.querySelector('.total-price').textContent = total.toFixed(2) + '€';
+    updateOrderTotal();
+}
+
+function updateOrderTotal() {
+    let total = 0;
+    document.querySelectorAll('tbody tr').forEach(row => {
+        let price = parseFloat(row.querySelector('td:nth-child(3)').textContent.replace('€', '').replace(',', '.'));
+        let quantityInput = row.querySelector('input');
+        let quantity = parseInt(quantityInput.value) || 0;
+        total += price * quantity;
+    });
+
+    document.getElementById('totalCommande').textContent = total.toFixed(2) + '€';
+    document.getElementById('montant_total_input').value = total.toFixed(2); // met à jour le champ hidden
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateOrderTotal();
+});
+</script>
+
+<script>
+document.getElementById('btnValiderPaiement').addEventListener('click', async () => {
+    console.log("Bouton cliqué");
+
+    // Récupérer les données du formulaire
+    let form = document.querySelector('form');
+    let formData = new FormData(form);
+    let totalCommande = document.getElementById('totalCommande').textContent.replace('€', '').trim();
+   /* formData.append('commande[montant_total]', totalCommande);
+    console.log(totalCommande);
+
+console.log(formData);*/
+
+    // Enregistrer la commande dans la session avec AJAX
+    let response = await fetch("/commandes/store", {
+        method: 'POST',
+        body: formData
+    });
+
+    let result = await response.json();
+    console.log("Session enregistrée :", result);
+
+    if (result.success) {
+        let totalCommande = parseFloat(document.getElementById('totalCommande').textContent.replace('€', '').replace(',', ''));
+        let stripe = Stripe('{{ stripe_public_key }}');
+        let session = await fetch("/create-checkout-session", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+    body: JSON.stringify({
+                items: [
+                    {
+                        name: "Total Commande",
+                        price: parseFloat(totalCommande), // Montant total envoyé
+                        quantity: 1
+                    }
+                ]
+            })
+        });
+
+        let data = await session.json();
+
+        if (data.id) {
+            stripe.redirectToCheckout({ sessionId: data.id });
+        }
+    } else {
+        alert("Erreur lors de l'enregistrement de la commande");
+    }
+});
+
+
+</script>
+
+{% endblock %}

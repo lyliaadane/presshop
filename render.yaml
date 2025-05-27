@@ -1,16 +1,14 @@
-# Exported from Render on 2025-05-27T11:10:11Z
 services:
-- type: web
-  name: presshop
-  runtime: node
-  repo: https://github.com/lyliaadane/presshop
-  plan: free
-  envVars:
-  - key: APP_ENV
-    sync: false
-  region: oregon
-  buildCommand: composer install --no-dev --optimize-autoloader
-  startCommand: php -S 0.0.0.0:10000 -t public
-  autoDeployTrigger: commit
-  rootDir: ./
-version: "1"
+  - type: web
+    name: presshop
+    env: php
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y unzip zip git curl
+      curl -sS https://getcomposer.org/installer | php
+      php composer.phar install --no-dev --optimize-autoloader
+    startCommand: php -S 0.0.0.0:10000 -t public
+    rootDir: .
+    envVars:
+      - key: APP_ENV
+        value: prod

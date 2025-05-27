@@ -1,14 +1,9 @@
 services:
   - type: web
     name: presshop
-    runtime: php
+    runtime: docker
     plan: free
-    buildCommand: |
-      apt-get update && apt-get install -y unzip zip git curl
-      curl -sS https://getcomposer.org/installer | php
-      php composer.phar install --no-dev --optimize-autoloader
-    startCommand: php -S 0.0.0.0:10000 -t public
-    rootDir: .
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_ENV
         value: prod

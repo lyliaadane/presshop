@@ -12,8 +12,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 WORKDIR /app
 COPY . /app
 
-# Installe les dépendances Symfony
-RUN composer install --no-dev --optimize-autoloader
+# Installe les dépendances Symfony sans exécuter les scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 EXPOSE 8000
 

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: presshop
+    env: php
+    plan: free
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php -S 0.0.0.0:10000 -t public"
+    rootDir: .
+    envVars:
+      - key: APP_ENV
+        value: prod
+
